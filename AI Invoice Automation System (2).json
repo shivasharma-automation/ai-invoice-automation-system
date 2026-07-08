@@ -1,0 +1,469 @@
+{
+  "name": "AI Invoice Automation System",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "invoice",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -720,
+        -368
+      ],
+      "id": "d4bfd138-b768-424f-ba3e-d699d30498f2",
+      "name": "Webhook",
+      "webhookId": "58d2626e-d99c-4455-9208-be84351324d6"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "8d88a3bb-6a5f-4eaa-8821-25a9f2ae36e7",
+              "name": "customerName",
+              "value": "={{$json.body.customerName}}",
+              "type": "string"
+            },
+            {
+              "id": "115262c0-dfac-41fc-b0de-e3c977896769",
+              "name": "customerEmail",
+              "value": "={{$json.body.customerEmail}}",
+              "type": "string"
+            },
+            {
+              "id": "c039b855-9f80-43c6-b539-8f4e14f44dc7",
+              "name": "companyName",
+              "value": "={{$json.body.companyName}}",
+              "type": "string"
+            },
+            {
+              "id": "6dee38fe-14c7-4c44-bad6-a98bf5323ad5",
+              "name": "invoiceNumber",
+              "value": "={{$json.body.invoiceNumber}}",
+              "type": "string"
+            },
+            {
+              "id": "851ad977-cd38-4d6b-a3ca-d09e25f69add",
+              "name": "invoiceDate",
+              "value": "={{$json.body.invoiceDate}}",
+              "type": "string"
+            },
+            {
+              "id": "7fba72d9-dd2e-418f-8d87-4ebfe1a63457",
+              "name": "serviceDescription",
+              "value": "={{$json.body.serviceDescription}}",
+              "type": "string"
+            },
+            {
+              "id": "c76fa1d2-aa7b-44f8-a798-e496137c34bc",
+              "name": "amount",
+              "value": "={{$json.body.amount}}",
+              "type": "string"
+            },
+            {
+              "id": "4c0aeb72-8dcc-4416-a2b5-9367d41555d2",
+              "name": "notes",
+              "value": "={{$json.body.notes}}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -496,
+        -288
+      ],
+      "id": "4ea22371-18be-4fdb-8ced-fa48209d50e1",
+      "name": "Prepare Invoice Data"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are a professional business invoice assistant.\n\nUsing the customer information below, generate professional invoice content.\n\nCustomer Name: {{$json.customerName}}\nCustomer Email: {{$json.customerEmail}}\nCompany Name: {{$json.companyName}}\nInvoice Number: {{$json.invoiceNumber}}\nInvoice Date: {{$json.invoiceDate}}\nService Description: {{$json.serviceDescription}}\nInvoice Amount: ₹{{$json.amount}}\nAdditional Notes: {{$json.notes}}\n\nGenerate the following:\n\n1. Professional invoice summary\n\n2. Thank you note\n\n3. Payment reminder\n\n4. Professional email subject\n\n5. Professional email body\n\nWrite the response in clean Markdown with clear headings.",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -176,
+        -384
+      ],
+      "id": "25122da9-09de-4832-b487-853f7244e5de",
+      "name": "Generate Invoice Content"
+    },
+    {
+      "parameters": {
+        "model": "llama-3.3-70b-versatile",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        -480,
+        -48
+      ],
+      "id": "5f54a63f-eddf-4a97-a314-eb63c9b4e9cb",
+      "name": "Groq Chat Model",
+      "credentials": {
+        "groqApi": {
+          "id": "U1TicEfjyQUzucFj",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const item = $input.first().json;\n\n// Due Date (7 days after invoice date)\nconst invoiceDate = new Date(item.invoiceDate);\n\nconst dueDate = new Date(invoiceDate);\n\ndueDate.setDate(dueDate.getDate() + 7);\n\nconst formattedDue =\ndueDate.toISOString().split(\"T\")[0];\n\nconst html = `\n<!DOCTYPE html>\n\n<html lang=\"en\">\n\n<head>\n\n<meta charset=\"UTF-8\">\n\n<title>Professional Invoice</title>\n\n<style>\n\n*{\nmargin:0;\npadding:0;\nbox-sizing:border-box;\n}\n\nbody{\n\nfont-family:Arial,Helvetica,sans-serif;\n\nbackground:#eef3f9;\n\npadding:40px;\n\ncolor:#333;\n\n}\n\n.invoice{\n\nmax-width:900px;\n\nmargin:auto;\n\nbackground:#fff;\n\nborder-radius:18px;\n\noverflow:hidden;\n\nbox-shadow:0 15px 40px rgba(0,0,0,.12);\n\n}\n\n.header{\n\nbackground:linear-gradient(135deg,#2563eb,#1d4ed8);\n\ncolor:white;\n\npadding:45px;\n\ndisplay:flex;\n\njustify-content:space-between;\n\nalign-items:flex-start;\n\n}\n\n.logo h1{\n\nfont-size:34px;\n\nmargin-bottom:8px;\n\n}\n\n.logo p{\n\nopacity:.9;\n\nline-height:1.7;\n\nfont-size:14px;\n\n}\n\n.invoice-info{\n\ntext-align:right;\n\n}\n\n.invoice-info h2{\n\nfont-size:34px;\n\nmargin-bottom:15px;\n\n}\n\n.badge{\n\ndisplay:inline-block;\n\npadding:8px 18px;\n\nbackground:#22c55e;\n\nborder-radius:30px;\n\nfont-weight:bold;\n\nmargin-bottom:15px;\n\n}\n\n.details{\n\ndisplay:grid;\n\ngrid-template-columns:1fr 1fr;\n\ngap:40px;\n\npadding:40px;\n\n}\n\n.card{\n\nbackground:#f8fafc;\n\npadding:25px;\n\nborder-radius:12px;\n\n}\n\n.card h3{\n\nmargin-bottom:15px;\n\ncolor:#2563eb;\n\nfont-size:20px;\n\n}\n\n.card p{\n\nmargin:8px 0;\n\nline-height:1.6;\n\n}\n\ntable{\n\nwidth:calc(100% - 80px);\n\nmargin:0 40px 40px;\n\nborder-collapse:collapse;\n\n}\n\nth{\n\nbackground:#2563eb;\n\ncolor:white;\n\npadding:15px;\n\ntext-align:left;\n\n}\n\ntd{\n\npadding:15px;\n\nborder-bottom:1px solid #e5e7eb;\n\n}\n\n.total-box{\n\nwidth:320px;\n\nmargin-left:auto;\n\nmargin-right:40px;\n\nbackground:#2563eb;\n\ncolor:white;\n\npadding:25px;\n\nborder-radius:15px;\n\nmargin-bottom:40px;\n\n}\n\n.total-box h2{\n\nfont-size:32px;\n\nmargin-top:10px;\n\n}\n\n.summary{\n\nmargin:40px;\n\nbackground:#f8fafc;\n\npadding:30px;\n\nborder-radius:15px;\n\n}\n\n.summary h2{\n\ncolor:#2563eb;\n\nmargin-bottom:20px;\n\n}\n\n.summary p{\n\nline-height:1.8;\n\nmargin-bottom:15px;\n\n}\n\n.terms{\n\nmargin:40px;\n\nbackground:#fff8e7;\n\nborder-left:6px solid orange;\n\npadding:25px;\n\nborder-radius:10px;\n\n}\n\n.footer{\n\nbackground:#0f172a;\n\ncolor:white;\n\ntext-align:center;\n\npadding:30px;\n\nmargin-top:40px;\n\n}\n\n.footer h3{\n\nmargin-bottom:10px;\n\n}\n\n</style>\n\n</head>\n\n<body>\n\n<div class=\"invoice\">\n\n<div class=\"header\">\n\n<div class=\"logo\">\n\n<h1>ABC SOLUTIONS</h1>\n\n<p>\n\nAI Automation Company<br>\n\nsupport@abc.com<br>\n\nwww.abc.com\n\n</p>\n\n</div>\n\n<div class=\"invoice-info\">\n\n<h2>INVOICE</h2>\n\n<div class=\"badge\">PENDING</div>\n\n<p><b>Invoice No:</b> ${item.invoiceNumber}</p>\n\n<p><b>Date:</b> ${item.invoiceDate}</p>\n\n<p><b>Due Date:</b> ${formattedDue}</p>\n\n</div>\n\n</div>\n\n<div class=\"details\">\n\n<div class=\"card\">\n\n<h3>Bill To</h3>\n\n<p><b>Name:</b> ${item.customerName}</p>\n\n<p><b>Email:</b> ${item.customerEmail}</p>\n\n<p><b>Company:</b> ${item.companyName}</p>\n\n</div>\n\n<div class=\"card\">\n\n<h3>Invoice Details</h3>\n\n<p><b>Invoice:</b> ${item.invoiceNumber}</p>\n\n<p><b>Status:</b> Pending</p>\n\n<p><b>Currency:</b> INR (₹)</p>\n\n</div>\n</div>\n\n<table>\n\n<tr>\n<th style=\"width:60%\">Service Description</th>\n<th style=\"width:20%\">Quantity</th>\n<th style=\"width:20%\">Amount</th>\n</tr>\n\n<tr>\n<td>${item.serviceDescription}</td>\n<td>1</td>\n<td>₹${Number(item.amount).toLocaleString(\"en-IN\")}</td>\n</tr>\n\n</table>\n\n<div class=\"total-box\">\n\n<p>Subtotal</p>\n\n<h2>₹${Number(item.amount).toLocaleString(\"en-IN\")}</h2>\n\n<hr style=\"margin:20px 0;border:none;border-top:1px solid rgba(255,255,255,.3)\">\n\n<p>GST</p>\n\n<h3>₹0</h3>\n\n<hr style=\"margin:20px 0;border:none;border-top:1px solid rgba(255,255,255,.3)\">\n\n<p><b>Total Amount</b></p>\n\n<h2>₹${Number(item.amount).toLocaleString(\"en-IN\")}</h2>\n\n</div>\n\n<div class=\"summary\">\n\n<h2>Invoice Summary</h2>\n\n<p>\n\nThis invoice has been automatically generated by our AI Invoice Automation System.\n\nPlease review the service details and complete the payment before the due date.\n\n</p>\n\n<p>\n\nInvoice Number:\n<b>${item.invoiceNumber}</b>\n\n</p>\n\n<p>\n\nService Provided:\n<b>${item.serviceDescription}</b>\n\n</p>\n\n<p>\n\nInvoice Amount:\n<b>₹${Number(item.amount).toLocaleString(\"en-IN\")}</b>\n\n</p>\n\n</div>\n<div class=\"terms\">\n\n<h2 style=\"color:#d97706;margin-bottom:15px;\">\nPayment Instructions\n</h2>\n\n<p>\n• Please complete the payment within <b>7 days</b> from the invoice date.\n</p>\n\n<p>\n• Bank Transfer / UPI / Net Banking accepted.\n</p>\n\n<p>\n• Kindly mention your Invoice Number while making the payment.\n</p>\n\n<p>\n• For any billing questions contact:\n<b>support@abc.com</b>\n</p>\n\n</div>\n\n<div class=\"terms\">\n\n<h2 style=\"color:#d97706;margin-bottom:15px;\">\nTerms & Conditions\n</h2>\n\n<p>\n• This invoice has been generated automatically by our AI Invoice Automation System.\n</p>\n\n<p>\n• Late payments may be subject to additional charges.\n</p>\n\n<p>\n• This document is valid without signature.\n</p>\n\n<p>\n• Thank you for choosing ABC Solutions.\n</p>\n\n</div>\n\n<div class=\"footer\">\n\n<h3>Thank You For Your Business ❤️</h3>\n\n<p>\nABC Solutions | AI Automation Company\n</p>\n\n<p>\nsupport@abc.com\n</p>\n\n<p>\nwww.abc.com\n</p>\n\n<p style=\"margin-top:15px;font-size:13px;color:#cbd5e1;\">\n\nThis invoice was automatically generated using\nAI + n8n + Groq + PDF Automation.\n\n</p>\n\n</div>\n\n</div>\n\n</body>\n\n</html>\n`;\n\nitem.html = html;\n\nreturn [\n{\njson:item,\nbinary:{}\n}\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        80,
+        -160
+      ],
+      "id": "dc894e66-d1f2-4ec7-bc98-3f9d8100fbfc",
+      "name": "Generate Invoice HTML"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        -176,
+        -160
+      ],
+      "id": "060e5c74-e530-4530-b559-1afbfbae4352",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "operation": "html",
+        "options": {
+          "fileName": "=Invoice_{{$json.invoiceNumber}}.html"
+        }
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        288,
+        -160
+      ],
+      "id": "9b4b7d12-bb57-4d53-bccf-1dedd14f1e05",
+      "name": "Convert to File"
+    },
+    {
+      "parameters": {
+        "sendTo": "www.shivasharma79134.r@gmail.com",
+        "subject": "=Invoice {{$json.invoiceNumber}} - {{$json.companyName}}",
+        "message": "=<p>Dear {{$json.customerName}},</p>\n\n<p>Please find your invoice attached.</p>\n\n<p>\nInvoice Number: <b>{{$json.invoiceNumber}}</b><br>\nDate: {{$json.invoiceDate}}\n</p>\n\n<p>Thank you for your business.</p>\n\n<p>Regards,<br>{{$json.companyName}}</p>",
+        "options": {
+          "attachmentsUi": {
+            "attachmentsBinary": [
+              {}
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        528,
+        64
+      ],
+      "id": "9f36e4d7-729a-488f-b739-db0a461f137b",
+      "name": "Send a message",
+      "webhookId": "caf45205-c8c9-4449-8319-3c2d30593ebb",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "7GzEn6vGdebGct6q",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "html_content": "={{$node[\"Generate Invoice HTML\"].json.html}}",
+        "output_format": "file",
+        "output_filename": "=Invoice-{{$node[\"Generate Invoice HTML\"].json.invoiceNumber}}"
+      },
+      "type": "n8n-nodes-htmlcsstopdf.htmlcsstopdf",
+      "typeVersion": 1,
+      "position": [
+        320,
+        64
+      ],
+      "id": "8bfc35a9-2bba-4f5e-8e7f-cc45e989a8f5",
+      "name": "Convert HTML to PDF",
+      "credentials": {
+        "htmlcsstopdfApi": {
+          "id": "kd1eu8cirTPT7w5W",
+          "name": "HTML to PDF account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1xn9PqivKi1JXsrPNtesTDRqhaGgM99voMxJ4OvBhH8Y",
+          "mode": "list",
+          "cachedResultName": "AI Invoice Database",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1xn9PqivKi1JXsrPNtesTDRqhaGgM99voMxJ4OvBhH8Y/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1xn9PqivKi1JXsrPNtesTDRqhaGgM99voMxJ4OvBhH8Y/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Invoice Number": "={{$node[\"Merge\"].json.invoiceNumber}}",
+            "Customer Name": "={{$node[\"Merge\"].json.customerName}}",
+            "Customer Email": "={{$node[\"Merge\"].json.customerEmail}}",
+            "Amount": "={{$node[\"Merge\"].json.amount}}",
+            "Invoice Date": "={{$node[\"Merge\"].json.invoiceDate}}",
+            "Company Name": "={{$node[\"Merge\"].json.companyName}}",
+            "Service": "={{$node[\"Merge\"].json.serviceDescription}}",
+            "Due Date": "=={{ new Date(new Date($node[\"Merge\"].json.invoiceDate).getTime() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0] }}",
+            "Status": "Paid"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Invoice Number",
+              "displayName": "Invoice Number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Customer Name",
+              "displayName": "Customer Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Customer Email",
+              "displayName": "Customer Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Company Name",
+              "displayName": "Company Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Service",
+              "displayName": "Service",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Amount",
+              "displayName": "Amount",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Invoice Date",
+              "displayName": "Invoice Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Due Date",
+              "displayName": "Due Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        160,
+        256
+      ],
+      "id": "10422bee-1e21-4f67-8ade-4ae31b748e73",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "cqdtlNOpDiGwAq7g",
+          "name": "Google Sheets account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Prepare Invoice Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Invoice Data": {
+      "main": [
+        [
+          {
+            "node": "Generate Invoice Content",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Generate Invoice Content",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Invoice Content": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Generate Invoice HTML",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Invoice HTML": {
+      "main": [
+        [
+          {
+            "node": "Convert to File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to File": {
+      "main": [
+        [
+          {
+            "node": "Convert HTML to PDF",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message": {
+      "main": [
+        []
+      ]
+    },
+    "Convert HTML to PDF": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "a53643ff-d2f7-4722-8407-8346c35b24fd",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "e36b7be5b3a8bf583d0e5da8b64960d123a9c1ebc1d993f76c42d35ab343f94d"
+  },
+  "nodeGroups": [],
+  "id": "NEn9GxBGhg0aQt0Z",
+  "tags": []
+}

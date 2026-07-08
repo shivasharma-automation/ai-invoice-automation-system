@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>AI Invoice Automation System</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <div class="container">
+
+        <div class="header">
+            <h1>AI Invoice Automation</h1>
+            <p>Create Professional AI Powered Invoices</p>
+        </div>
+
+        <form id="invoiceForm">
+
+            <div class="input-group">
+                <label>Customer Name</label>
+                <input type="text" id="customerName" placeholder="Enter customer name" required>
+            </div>
+
+            <div class="input-group">
+                <label>Customer Email</label>
+                <input type="email" id="customerEmail" placeholder="Enter customer email" required>
+            </div>
+
+            <div class="input-group">
+                <label>Company Name</label>
+                <input type="text" id="companyName" placeholder="Enter company name">
+            </div>
+
+            <div class="row">
+
+                <div class="input-group">
+                    <label>Invoice Number</label>
+                    <input type="text" id="invoiceNumber" readonly>
+                </div>
+
+                <div class="input-group">
+                    <label>Invoice Date</label>
+                    <input type="date" id="invoiceDate">
+                </div>
+
+            </div>
+
+            <div class="input-group">
+                <label>Service Description</label>
+                <textarea id="serviceDescription" rows="4"
+                    placeholder="Describe the service"></textarea>
+            </div>
+
+            <div class="input-group">
+                <label>Invoice Amount (₹)</label>
+                <input type="number" id="amount" placeholder="Enter amount">
+            </div>
+
+            <div class="input-group">
+                <label>Additional Notes</label>
+                <textarea id="notes" rows="3"
+                    placeholder="Optional notes"></textarea>
+            </div>
+
+            <button type="submit">
+                Generate Invoice
+            </button>
+
+        </form>
+
+    </div>
+
+    <script src="script.js"></script>
+
+</body>
+
+</html>
